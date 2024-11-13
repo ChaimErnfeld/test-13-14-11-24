@@ -10,22 +10,25 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { status } = useSelector((state: RootState) => state.user);
-  // const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   if (status === "loading") {
     return <p>Loading...</p>;
   }
 
-  // !token ||
-  if (status === "failed") {
+  if (!token || status === "failed") {
     return <Navigate to="/login" replace />;
   }
 
-  // const decoded = jwtDecode<{ id: string; isAdmin: boolean }>(token);
+  const decoded = jwtDecode<{ id: string; organization: string; district?: string }>(token!);
 
-  // if (decoded.isAdmin === true) {
-  //   return <Navigate to="/admin" replace />;
-  // }
+  if (decoded.organization === "IDF") {
+    return <Navigate to="/defence" replace />;
+  }
+
+  if (decoded.organization !== "IDF") {
+    return <Navigate to="/attack" replace />;
+  }
 
   return children;
 };

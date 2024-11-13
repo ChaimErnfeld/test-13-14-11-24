@@ -4,6 +4,7 @@ import { loginUser } from "../../store/fetchers/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 import "./LoginPage.css";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -15,7 +16,14 @@ const Login = () => {
   const handleForm = (e: FormEvent) => {
     e.preventDefault();
     dispatch(loginUser({ username, password }));
-    navigate("/register");
+    const token = localStorage.getItem("token");
+    const decoded = jwtDecode<{ id: string; organization: string; district?: string }>(token!);
+    if (decoded.organization === "IDF") {
+      navigate("/defence");
+    }
+    if (decoded.organization !== "IDF") {
+      navigate("/attack");
+    }
   };
 
   return (

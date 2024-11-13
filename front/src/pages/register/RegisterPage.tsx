@@ -17,7 +17,7 @@ const Register = () => {
   const handleForm = (e: FormEvent) => {
     e.preventDefault();
     if (organization === "IDF") {
-      console.log({ username, password, organization, district });
+      // console.log({ username, password, organization, district });
 
       dispatch(registerUser({ username, password, organization, district }));
       //   navigate("/login");

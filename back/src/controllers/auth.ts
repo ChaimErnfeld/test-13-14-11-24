@@ -57,7 +57,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       }
     );
 
-    res.status(200).json({ token, user: existUser, success: true });
+    res.status(200).json({ token, success: true });
   } catch (error) {
     res.status(400).json({ message: "error", success: false });
   }
