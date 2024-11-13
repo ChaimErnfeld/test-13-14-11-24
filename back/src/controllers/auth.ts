@@ -49,11 +49,15 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // const token = jwt.sign({ id: existUser._id, isAdmin: existUser.isAdmin }, process.env.JWT_SECRET!, {
-    //   expiresIn: "1h",
-    // });
+    const token = jwt.sign(
+      { id: existUser._id, organization: existUser.organization, district: existUser.district },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: "1h",
+      }
+    );
 
-    res.status(200).json({ user: existUser, success: true });
+    res.status(200).json({ token, user: existUser, success: true });
   } catch (error) {
     res.status(400).json({ message: "error", success: false });
   }
