@@ -16,7 +16,7 @@ const Login = () => {
   const handleForm = (e: FormEvent) => {
     e.preventDefault();
     dispatch(loginUser({ username, password }));
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const decoded = jwtDecode<{ id: string; organization: string; district?: string }>(token!);
     if (decoded.organization === "IDF") {
       navigate("/defence");

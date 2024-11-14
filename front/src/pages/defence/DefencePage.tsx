@@ -15,7 +15,7 @@ const DefencePage = () => {
   const attacks: x[] = useSelector((state: any) => state.attack.attacks);
 
   //מחלץ מהטוקן את שם הארגון ואזור הארגון(אם קיים) כדי לשלח בגוף הבקשה
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const decoded = jwtDecode<{ id: string; organization: string; district?: string }>(token!);
 
   //מקבל את רשימת הטילים שיש לארגון הנוכחי
@@ -23,7 +23,7 @@ const DefencePage = () => {
 
   //שולח בקשה דרך הסלייס לקבל את כל הטילים של הארגון הנוכחי ושלוח לה באדי של שם הארגון ואזור הארגון
   useEffect(() => {
-    dispatch(getAmmos({ organization: "IDF", district: "West Bank" }));
+    dispatch(getAmmos({ organization: decoded.organization, district: decoded.district }));
     socket.on("updateMissile", (ammo) => {
       dispatch(updateAmountAmmo(ammo));
     });

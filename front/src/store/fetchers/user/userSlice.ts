@@ -24,7 +24,7 @@ export const loginUser = createAsyncThunk(
   "login/uesr",
   async (user: { username: string; password: string }): Promise<User> => {
     const response = await axios.post("http://localhost:3000/api/login", user);
-    localStorage.setItem("token", response.data.token);
+    sessionStorage.setItem("token", response.data.token);
     return response.data.token;
   }
 );

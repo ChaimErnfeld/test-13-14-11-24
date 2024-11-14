@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { status } = useSelector((state: RootState) => state.user);
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (status === "loading") {
     return <p>Loading...</p>;

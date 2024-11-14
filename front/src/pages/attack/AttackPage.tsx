@@ -12,7 +12,7 @@ import { updateAttackList } from "../../store/fetchers/attack/attackSlice";
 const AttackPage = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const decoded = jwtDecode<{ id: string; organization: string; district?: string }>(token!);
 
   //מקבל מערך עם מלאי הטילים שברשותו
