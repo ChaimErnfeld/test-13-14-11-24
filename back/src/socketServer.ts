@@ -12,26 +12,19 @@ export function initializeSocketServer(httpServer: HTTPServer) {
   io.on("connection", (socket) => {
     console.log("socket connected:", socket.id);
 
-    // Join a room
     socket.on("join", (room) => {
       socket.join(room);
       console.log(`Socket ${socket.id} joined room ${room}`);
     });
 
-    // Leave a room
     socket.on("leave", (room) => {
       socket.leave(room);
       console.log(`Socket ${socket.id} left room ${room}`);
     });
 
-    // Broadcast to a room
     socket.on("sendAttack", (room, attack) => {
-      io.to(room).emit("sendAttack", attack); // Emit message to specific room
+      io.to(room).emit("sendAttack", attack);
     });
-
-    // socket.on("sendAttack", async (attack) => {
-    //   io.emit("sendAttack", attack);
-    // });
 
     socket.on("updateMissile", async (missile) => {
       const existOrganization = await organizations.findOne({ name: missile.organization });

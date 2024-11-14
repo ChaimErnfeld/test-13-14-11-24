@@ -9,7 +9,6 @@ router.route("/register").post(register);
 
 router.route("/login").post(login);
 
-// isLogin לא לשכוח להוסיף
 router.route("/ammo").post(getResources);
 
 router.route("/ammo/:name").get(getDetailsOfAmmo);

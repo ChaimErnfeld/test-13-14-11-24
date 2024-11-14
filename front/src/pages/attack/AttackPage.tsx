@@ -41,8 +41,21 @@ const AttackPage = () => {
     };
   }, [ammos]);
 
+  useEffect(() => {
+    if (selectedAmmo) {
+      dispatch(getDetails(selectedAmmo!));
+    } else {
+      console.log("no ammo selected");
+    }
+  }, [selectedAmmo, dispatch]);
+
+  useEffect(() => {
+    if (attacksDetails) {
+      console.log("speed:", attacksDetails.speed);
+    }
+  }, [attacksDetails]);
+
   const handleAmmoClick = (ammoName: string) => {
-    dispatch(getDetails(ammoName!));
     setSelectedAmmo(ammoName);
 
     socket.emit("updateMissile", { organization: decoded.organization, name: ammoName });
@@ -51,7 +64,7 @@ const AttackPage = () => {
     socket.emit("sendAttack", district, {
       name: ammoName,
       organization: decoded.organization,
-      speed: 14,
+      speed: attacksDetails.speed,
     });
 
     setTableRows((prevRows) => [
@@ -59,7 +72,7 @@ const AttackPage = () => {
       {
         name: ammoName,
         organization: decoded.organization,
-        speed: attacksDetails.speed,
+        speed: 14,
       },
     ]);
   };
