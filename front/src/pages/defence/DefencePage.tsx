@@ -9,6 +9,9 @@ import "./DefencePage.css";
 const DefencePage = () => {
   const dispatch = useDispatch<AppDispatch>();
 
+  //משתנה שמקבל מערך עם כל האיומים שמשוגרים
+  const attacks = useSelector((state: any) => state.attack.attacks);
+
   const token = localStorage.getItem("token");
   const decoded = jwtDecode<{ id: string; organization: string; district?: string }>(token!);
 
@@ -20,13 +23,11 @@ const DefencePage = () => {
 
   return (
     <div className="DefencePage">
-      {/* Card header displaying organization and district */}
       <div className="card-header">
         <h2>Organization: {decoded.organization}</h2>
         {decoded.district && <p>District: {decoded.district}</p>}
       </div>
 
-      {/* Ammunition list */}
       <div className="ammo-list">
         {ammos.map((ammo) => {
           return (

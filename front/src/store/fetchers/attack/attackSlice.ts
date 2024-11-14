@@ -14,7 +14,7 @@ const initialState: AttackState = {
   error: "",
 };
 
-const getDetails = createAsyncThunk("attack/get", async (ammoName: string): Promise<AmmoDetails[]> => {
+export const getDetails = createAsyncThunk("attack/get", async (ammoName: string): Promise<AmmoDetails> => {
   const response = await axios.get(`http://localhost:3000/api/ammo/${ammoName}`);
   const data = response.data.data;
   return data;
@@ -28,10 +28,11 @@ export const attackSlice = createSlice({
     builder
       .addCase(getDetails.pending, (state) => {
         state.status = "loading";
+        state.error = null;
       })
       .addCase(getDetails.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.attack = action.payload;
+        state.attack.push(action.payload);
       })
       .addCase(getDetails.rejected, (state, action) => {
         state.status = "failed";
@@ -39,3 +40,5 @@ export const attackSlice = createSlice({
       });
   },
 });
+
+export default attackSlice.reducer;

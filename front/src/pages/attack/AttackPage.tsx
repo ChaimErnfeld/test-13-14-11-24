@@ -3,8 +3,10 @@ import "./AttackPage.css";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { jwtDecode } from "jwt-decode";
-import { Ammo } from "../../types";
-import { getAmmos } from "../../store/fetchers/ammo/ammoSlice";
+import { Ammo, AmmoDetails } from "../../types";
+import { getAmmos, updateAmountAmmo } from "../../store/fetchers/ammo/ammoSlice";
+import { getDetails } from "../../store/fetchers/attack/attackSlice";
+import socket from "../../socket";
 
 const AttackPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -13,19 +15,54 @@ const AttackPage = () => {
   const decoded = jwtDecode<{ id: string; organization: string; district?: string }>(token!);
 
   const ammos: Ammo[] = useSelector((state: any) => state.ammo.ammos);
+  //מקבך את מערך האיומים שמשוגרים מהסלייס
+  const attacks: AmmoDetails[] = useSelector((state: any) => state.attack.attack);
 
-  const [tableRows, setTableRows] = useState<{ rocket: string; time: string; status: string }[]>([]);
+  // const attackStatus = useSelector((state: any) => state.attack.status);
+
+  const [tableRows, setTableRows] = useState<{ rocket: string; time: number; status: string }[]>([]);
+  const [selectedAmmo, setSelectedAmmo] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(getAmmos({ organization: decoded.organization, district: decoded.district }));
-  }, []);
+    socket.on("updateMissile", (ammo) => {
+      dispatch(updateAmountAmmo(ammo));
+    });
+    return () => {
+      socket.off("updateMissile");
+    };
+  });
+
+  // useEffect(() => {
+  //   if (attackStatus === "succeeded" && ammosDetails && selectedAmmo) {
+  //     const newRow = { rocket: selectedAmmo, time: ammosDetails.speed, status: "Pending" };
+  //     setTableRows((prevRows) => [...prevRows, newRow]);
+  //     setSelectedAmmo(null);
+  //   }
+  // }, [attackStatus, ammosDetails, selectedAmmo]);
 
   const handleAmmoClick = (ammoName: string) => {
-    const currentTime = new Date().toLocaleString();
-    const newRow = { rocket: ammoName, time: currentTime, status: "Pending" };
-
-    setTableRows((prevRows) => [...prevRows, newRow]);
+    setSelectedAmmo(ammoName);
+    dispatch(getDetails(ammoName));
+    socket.emit("updateMissile", { organization: decoded.organization, name: ammoName });
   };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setTableRows((prevRows) =>
+        prevRows.map((row) => {
+          if (row.time > 0) {
+            return { ...row, time: row.time - 1 };
+          } else if (row.time === 0 && row.status === "Pending") {
+            return { ...row, status: "Hit" };
+          }
+          return row;
+        })
+      );
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <div className="AttackPage">
@@ -45,7 +82,7 @@ const AttackPage = () => {
       <div className="ammo-list">
         {ammos.map((ammo) => {
           return (
-            <div key={Date.now()} className="ammo-item" onClick={() => handleAmmoClick(ammo.name)}>
+            <div key={ammo.name} className="ammo-item" onClick={() => handleAmmoClick(ammo.name)}>
               {ammo.name} X {ammo.amount}
             </div>
           );

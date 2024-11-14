@@ -31,7 +31,14 @@ export const getAmmos = createAsyncThunk(
 const ammoSlice = createSlice({
   name: "ammo",
   initialState,
-  reducers: {},
+  reducers: {
+    updateAmountAmmo: (state, action) => {
+      const updatedAmmo = action.payload;
+      state.ammos = state.ammos.map((ammo) =>
+        ammo.name === updatedAmmo.name ? { ...ammo, amount: updatedAmmo.amount } : ammo
+      );
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(getAmmos.pending, (state) => {
@@ -49,3 +56,4 @@ const ammoSlice = createSlice({
 });
 
 export default ammoSlice.reducer;
+export const { updateAmountAmmo } = ammoSlice.actions;
