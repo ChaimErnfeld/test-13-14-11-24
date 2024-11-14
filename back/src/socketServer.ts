@@ -18,13 +18,17 @@ export function initializeSocketServer(httpServer: HTTPServer) {
 
     socket.on("updateMissile", async (missile) => {
       const existOrganization = await organizations.findOne({ name: missile.organization });
-      existOrganization!.resources.forEach((resource) => {
-        if (resource.name === missile.name && resource.amount > 0) {
-          resource.amount--;
-        }
-      });
-      await existOrganization!.save();
-      io.emit("updateMissile", missile);
+      if (existOrganization) {
+        existOrganization.resources.forEach((resource) => {
+          if (resource.name === missile.name && resource.amount > 0) {
+            resource.amount--;
+          }
+        });
+        await existOrganization.save();
+        io.emit("updateMissile", missile);
+      } else {
+        console.error("Organization not found:", missile.organization);
+      }
     });
 
     socket.on("disconnect", (reason) => {

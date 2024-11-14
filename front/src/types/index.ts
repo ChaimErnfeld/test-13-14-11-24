@@ -18,3 +18,9 @@ export interface AmmoDetails {
   intercepts: string[];
   price: number;
 }
+
+export interface x {
+  name: string;
+  organization: string;
+  speed: number;
+}
