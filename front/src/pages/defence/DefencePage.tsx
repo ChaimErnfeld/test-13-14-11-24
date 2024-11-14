@@ -33,6 +33,8 @@ const DefencePage = () => {
   });
 
   useEffect(() => {
+    socket.emit("join", decoded.district);
+
     socket.on("sendAttack", (attack) => {
       console.log("Attack received:", attack);
       console.log("list:", attacks);
@@ -40,6 +42,7 @@ const DefencePage = () => {
       dispatch(updateAttackList(attack));
     });
     return () => {
+      socket.emit("leave", decoded.district);
       socket.off("sendAttack");
     };
   }, []);

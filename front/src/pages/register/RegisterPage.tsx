@@ -17,16 +17,10 @@ const Register = () => {
   const handleForm = (e: FormEvent) => {
     e.preventDefault();
     if (organization === "IDF") {
-      // console.log({ username, password, organization, district });
-
       dispatch(registerUser({ username, password, organization, district }));
-      //   navigate("/login");
       return;
     } else {
-      console.log({ username, password, organization });
-
       dispatch(registerUser({ username, password, organization }));
-      //   navigate("/login");
       return;
     }
   };
@@ -51,15 +45,17 @@ const Register = () => {
         <option value="IRGC">IRGC</option>
         <option value="Houthis">Houthis</option>
       </select>
-      <select name="district" id="district" defaultValue="select" onChange={(e) => setDistrict(e.target.value)}>
-        <option value="select" disabled>
-          Select
-        </option>
-        <option value="North">North</option>
-        <option value="South">South</option>
-        <option value="Center">Center</option>
-        <option value="WestBank">West Bank</option>
-      </select>
+      {organization === "IDF" && (
+        <select name="district" id="district" defaultValue="select" onChange={(e) => setDistrict(e.target.value)}>
+          <option value="select" disabled>
+            Select
+          </option>
+          <option value="North">North</option>
+          <option value="South">South</option>
+          <option value="Center">Center</option>
+          <option value="WestBank">West Bank</option>
+        </select>
+      )}
       <button type="submit">Register</button>
       <p>
         רשום כבר? <a href="/login">התחבר</a>
