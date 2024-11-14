@@ -5,18 +5,19 @@ import { AppDispatch } from "../../store/store";
 import { jwtDecode } from "jwt-decode";
 import { Ammo, AmmoDetails, x } from "../../types";
 import { getAmmos, updateAmountAmmo } from "../../store/fetchers/ammo/ammoSlice";
-// import { getDetails } from "../../store/fetchers/attack/attackSlice";
 import socket from "../../socket";
 import { getDetails, updateAttackList } from "../../store/fetchers/attack/attackSlice";
+import { useNavigate } from "react-router-dom";
 
 const AttackPage = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const token = sessionStorage.getItem("token");
   const decoded = jwtDecode<{ id: string; organization: string; district?: string }>(token!);
 
   //מקבל מערך עם מלאי הטילים שברשותו
-  const ammos: Ammo[] = useSelector((state: any) => state.ammo.ammos); //
+  const ammos: Ammo[] = useSelector((state: any) => state.ammo.ammos);
 
   //מקבך את מערך האיומים שמשוגרים מהסלייס
   const attacks: x[] = useSelector((state: any) => state.attack.attacks);
@@ -26,14 +27,12 @@ const AttackPage = () => {
 
   const [district, setDistrict] = useState("");
 
-  // const attackStatus = useSelector((state: any) => state.attack.status);
-
   const [tableRows, setTableRows] = useState<x[]>([]);
   const [selectedAmmo, setSelectedAmmo] = useState<string | null>(null);
 
-  dispatch(getAmmos({ organization: decoded.organization, district: decoded.district }));
-
   useEffect(() => {
+    dispatch(getAmmos({ organization: decoded.organization, district: decoded.district }));
+
     socket.on("updateMissile", (ammo) => {
       dispatch(updateAmountAmmo(ammo));
     });
@@ -42,36 +41,19 @@ const AttackPage = () => {
     };
   }, [ammos]);
 
-  // useEffect(() => {
-  //   socket.on("sendAttack", (attack) => {
-  //     console.log("Attack received:", attack);
-  //     console.log("list:", attacks);
-
-  //     dispatch(updateAttackList(attack));
-  //   });
-  //   return () => {
-  //     socket.off("sendAttack");
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   if (attackStatus === "succeeded" && ammosDetails && selectedAmmo) {
-  //     const newRow = { rocket: selectedAmmo, time: ammosDetails.speed, status: "Pending" };
-  //     setTableRows((prevRows) => [...prevRows, newRow]);
-  //     setSelectedAmmo(null);
-  //   }
-  // }, [attackStatus, ammosDetails, selectedAmmo]);
-
   const handleAmmoClick = (ammoName: string) => {
-    dispatch(getDetails(ammoName));
-    setSelectedAmmo(ammoName); //
+    dispatch(getDetails(ammoName!));
+    setSelectedAmmo(ammoName);
 
     socket.emit("updateMissile", { organization: decoded.organization, name: ammoName });
-    // console.log({
-    //   name: ammoName,
-    //   organization: decoded.organization,
-    //   speed: attacksDetails.speed,
-    // });
+    console.log("speed:" + attacksDetails.speed);
+
+    socket.emit("sendAttack", district, {
+      name: ammoName,
+      organization: decoded.organization,
+      speed: 14,
+    });
+
     setTableRows((prevRows) => [
       ...prevRows,
       {
@@ -80,33 +62,18 @@ const AttackPage = () => {
         speed: attacksDetails.speed,
       },
     ]);
-    socket.emit("sendAttack", district, {
-      name: ammoName,
-      organization: decoded.organization,
-      speed: attacksDetails.speed,
-    });
   };
-
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     dispatch(
-  //       updateAttackList(
-  //         attacks.map((attack) => {
-  //           if (attack.speed > 0) {
-  //             return { ...attack, speed: attack.speed - 1 };
-  //           } else {
-  //             return { ...attack, status: "Hit" };
-  //           }
-  //         })
-  //       )
-  //     );
-  //   }, 1000);
-
-  //   return () => clearInterval(intervalId);
-  // }, [attacks, dispatch]);
 
   return (
     <div className="AttackPage">
+      <button
+        onClick={() => {
+          sessionStorage.removeItem("token");
+          navigate("/login");
+        }}
+      >
+        Logout
+      </button>
       <div className="card-header">
         <h2>Organization: {decoded.organization}</h2>
         {decoded.district && <p>District: {decoded.district}</p>}
@@ -151,16 +118,6 @@ const AttackPage = () => {
           <p>No attacks available</p>
         )}
       </table>
-      {/* {attacks && attacks.length > 0 ? (
-        attacks.map((attack, index) => (
-          <div key={index}>
-            <p>{attack.name}</p>
-            <p>{attack.speed}</p>
-          </div>
-        ))
-      ) : (
-        <p>No attacks available</p>
-      )} */}
     </div>
   );
 };

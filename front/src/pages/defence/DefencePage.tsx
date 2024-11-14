@@ -7,9 +7,11 @@ import { Ammo, AmmoDetails, x } from "../../types";
 import "./DefencePage.css";
 import socket from "../../socket";
 import { updateAttackList } from "../../store/fetchers/attack/attackSlice";
+import { useNavigate } from "react-router-dom";
 
 const DefencePage = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   //משתנה שמקבל מערך עם כל האיומים שמשוגרים
   const attacks: x[] = useSelector((state: any) => state.attack.attacks);
@@ -49,6 +51,14 @@ const DefencePage = () => {
 
   return (
     <div className="DefencePage">
+      <button
+        onClick={() => {
+          sessionStorage.removeItem("token");
+          navigate("/login");
+        }}
+      >
+        Logout
+      </button>
       <div className="card-header">
         {/* מחזיר את שם הארגון מהטוקן */}
         <h2>Organization: {decoded.organization}</h2>
@@ -65,30 +75,18 @@ const DefencePage = () => {
           );
         })}
       </div>
-      {/* {attacks.length > 0 && (
-        <div className="attack-list">
-          {attacks.map((attack) => {
-            return (
-              <div key={attack.name} className="attack-item">
-                {attack.name} X {attack.speed}
-              </div>
-            );
-          })}
-        </div>
-        
-      )} */}
       <table>
         <tr>
           <th>Rocket</th>
           <th>Time To Hite</th>
-          <th>Status</th>
+          <th>From</th>
         </tr>
         {attacks && attacks.length > 0 ? (
           attacks.map((attack, index) => (
             <tr key={index}>
               <td>{attack.name}</td>
               <td>{attack.speed}</td>
-              <td>{attack.organization}</td>
+              <td>{attack.organization}</td>❌
             </tr>
           ))
         ) : (

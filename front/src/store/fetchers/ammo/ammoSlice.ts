@@ -17,7 +17,7 @@ const initialState: AmmoState = {
 export const getAmmos = createAsyncThunk(
   "ammo/get",
   async (details: { organization: string; district?: string }): Promise<Ammo[]> => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const response = await axios.post("http://localhost:3000/api/ammo", details, {
       headers: {
         Authorization: `Bearer ${token}`,

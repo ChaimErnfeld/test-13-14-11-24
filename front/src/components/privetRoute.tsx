@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { RootState } from "../store/store";
 import { jwtDecode } from "jwt-decode";
 
@@ -11,6 +11,7 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { status } = useSelector((state: RootState) => state.user);
   const token = sessionStorage.getItem("token");
+  const navigate = useNavigate();
 
   if (status === "loading") {
     return <p>Loading...</p>;
@@ -23,11 +24,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const decoded = jwtDecode<{ id: string; organization: string; district?: string }>(token!);
 
   if (decoded.organization === "IDF") {
-    return <Navigate to="/defence" replace />;
+    navigate("/defence");
+    return;
   }
 
   if (decoded.organization !== "IDF") {
-    return <Navigate to="/attack" replace />;
+    navigate("/attack");
+    return;
   }
 
   return children;

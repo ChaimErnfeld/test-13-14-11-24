@@ -18,9 +18,11 @@ const Register = () => {
     e.preventDefault();
     if (organization === "IDF") {
       dispatch(registerUser({ username, password, organization, district }));
+      navigate("/login");
       return;
     } else {
       dispatch(registerUser({ username, password, organization }));
+      navigate("/login");
       return;
     }
   };
